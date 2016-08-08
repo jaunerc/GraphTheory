@@ -5,3 +5,5 @@ This repo provides two modules for simple graph theory calculations.
 <li>Each edge is stored in a tuple</li>
 <li>The random_graph function creates a graph with random edges</li>
 <li>The drawing modules uses tkinter</li>
+
+<img src="https://github.com/jaunerc/GraphTheory/blob/master/img/github_graphic.PNG" width=600/>
