@@ -238,7 +238,7 @@ def edges_from_adjacency_mat(M):
             for j in range(0, len(M)):
                 if j > i:
                     if M[i][j] != 0:
-                        edges.append((i, j))
+                        edges.append((i + 1, j + 1))
 
     else:
         print 'The given matrix is not a square matrix.'

@@ -98,6 +98,6 @@ def draw_graph(G, show_numbers, radius, padding_left, label,  w):
 #
 # Creates a random graph and an isomorphic copy.
 #
-g = random_graph(99,2)
+g = random_graph(1000,5)
 g2 = g.isomorphic_copy()[0]
 show_graphs(g, g2, False)
