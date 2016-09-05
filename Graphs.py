@@ -14,7 +14,13 @@ THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRI
 THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import random
+import random, math
+
+
+#
+# The maximum number of vertices
+#
+MAX_VERTICES = 1000000
 
 
 class Graph:
@@ -83,8 +89,8 @@ class Graph:
 
     def isomorphic_copy(self):
         """
-
-        :return:
+        Creates a random graph, that is isomorphic to self.
+        :return: The isomorphic graph, The isomorphism.
         """
         L = list(range(self.num_vertices()))
         random.shuffle(L)
@@ -121,7 +127,7 @@ def apply_isomorphism(G, f):
     return [(f(i), f(j)) for (i, j) in G]
 
 
-def random_adjacency_mat(vertices, degree):
+def random_adjacency_mat_fix_degree(vertices, degree):
     """
     Creates a random adjacency matrix. The algorithm creates a valid square matrix
     where each vertex has the given degree. The edges were built randomly. It is
@@ -213,6 +219,119 @@ def random_adjacency_mat(vertices, degree):
     return M
 
 
+def binomial_coefficient(n, k):
+    """
+    Calculates the binomial coefficient (C(n,k) read as "n choose k").
+    :param n: Real number.
+    :param k: Integer number.
+    :return: The number of ways to choose k elements of n.
+    """
+    if k < 0:
+        raise ValueError('k must be an integer >= 0')
+    if k == 0:
+        return 1
+    elif 2*k > n:
+        # Simplification C(n, k) = C(n, n - k)
+        return binomial_coefficient(n, n-k)
+
+    result = n - k + 1
+    for i in range(2, k+1):
+        result *= (n - k + i)
+        result /= i
+    return result
+
+
+def calc_min_number_of_vertices(num_edges):
+    """
+    Calculates the minimum number of vertices to build a simple, undirected graph with num_edges edges.
+    This function uses a property of complete graphs. The number of edges in complete graphs is
+    the binomial coefficient C(n, 2). A complete graph has an edge between every vertex. The number of edges
+    in a complete graph is the maximum for n vertices.
+
+    That function iterates through different numbers of vertices to find out the lowest possible value.
+    :param num_edges: The number of edges.
+    :return: The minimal number of vertices.
+    """
+    num_vertices = 0
+    if num_edges == 1:
+        return 2
+    elif num_edges > 1:
+        for i in range(2, MAX_VERTICES):
+            if binomial_coefficient(i, 2) >= num_edges:
+                num_vertices = i
+                break
+    return num_vertices
+
+
+def random_ind(L, other):
+    """
+    Returns a random index of the given list, where the element L[i]
+    is not equals other.
+    :param L: The list to choose a random index.
+    :param other: The object to compare.
+    :return: A random index of the list.
+    """
+    i = random.randint(0, len(L) - 1)
+    while L[i] == other:
+        i = random.randint(0, len(L) - 1)
+    return i
+
+
+def random_el(L):
+    """
+    Returns a random element of the given list.
+    :param L: The list to choose a random element.
+    :return: A random element of the list.
+    """
+    return L.pop(random.randint(0, len(L) - 1))
+
+
+def random_edges(num_edges):
+    """
+    Creates a list of random edges for an simple and undirected graph.
+    :param num_edges: The number of edges.
+    :return: List of random edges.
+    """
+    if num_edges > 0:
+        e = []
+        # Calculates the required number of vertices.
+        num_vertices = calc_min_number_of_vertices(num_edges)
+
+        # Creates a list with vertices.
+        # Each vertex is as many times member of the list as edges with that vertex are possible.
+        vertices = []
+        for i in range(0, num_vertices):
+            for j in range(0, num_vertices - 1):
+                vertices.append(i+1)
+
+        # Creates as many edges as required.
+        for i in range(0, num_edges):
+
+            # Get a random vertex.
+            a = random_el(vertices)
+
+            # Get the index of another random vertex.
+            # Loops are not allowed, vertex b must be different to vertex a.
+            b_i = random_ind(vertices, a)
+
+            # Add the edge (a, b) to the list
+            # if the edge is not already member of the list.
+            duplicate = True
+            while duplicate:
+                duplicate = False
+                for edge in e:
+                    if a in edge and vertices[b_i] in edge:
+                        duplicate = True
+                        b_i = random_ind(vertices, a)
+
+            b = vertices.pop(b_i)
+            e.append((a,b))
+
+        return e
+    else:
+        return []
+
+
 def print_mat(m):
     """
     Prints the given matrix. This method prints all values for each row in one line.
@@ -241,21 +360,33 @@ def edges_from_adjacency_mat(M):
                         edges.append((i + 1, j + 1))
 
     else:
-        print 'The given matrix is not a square matrix.'
+        raise ValueError('The given matrix is not a square matrix.')
 
     return edges
 
 
-def random_graph(vertices, degree):
+def random_graph_fix_degree(num_vertices, degree):
     """
     Creates a random graph. Each vertex of the graph has the same degree.
     The resulted graph is simple, undirected and unweighted.
-    :param vertices: The number of vertices.
+    :param num_vertices: The number of vertices.
     :param degree: The degree for each vertex.
     :return: A random created graph.
     """
-    M = random_adjacency_mat(vertices, degree)
+    M = random_adjacency_mat_fix_degree(num_vertices, degree)
     edges = edges_from_adjacency_mat(M)
-    print ('The resulted graph has '+str(vertices)+' vertices and '+str(len(edges))+' edges.')
+    print ('The resulted graph has '+str(num_vertices)+' vertices and '+str(len(edges))+' edges.')
     return Graph(edges)
 
+
+def random_graph(num_edges):
+    """
+    Creates a random graph with the given number of edges.
+    The resulted graph is simple, undirected and unweighted.
+    :param num_edges: The number of edges. Must be positive.
+    :return: A random creates graph.
+    """
+    if num_edges <= 0:
+        raise ValueError("The argument must be a positive integer.")
+    e = random_edges(num_edges)
+    return Graph(e)

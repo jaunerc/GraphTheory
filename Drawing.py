@@ -98,6 +98,9 @@ def draw_graph(G, show_numbers, radius, padding_left, label,  w):
 #
 # Creates a random graph and an isomorphic copy.
 #
-g = random_graph(1000,5)
+num_edges = 42
+g = random_graph(num_edges)
 g2 = g.isomorphic_copy()[0]
+
+print 'The random graph has '+str(g.num_vertices())+' vertices and '+str(num_edges)+ ' edges.'
 show_graphs(g, g2, False)
