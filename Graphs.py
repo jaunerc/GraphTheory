@@ -341,7 +341,7 @@ def print_mat(m):
         row = ''
         for y in range(0, len(m)):
             row += str(m[x][y])
-        print row
+        print (row)
 
 
 def edges_from_adjacency_mat(M):

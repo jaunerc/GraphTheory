@@ -15,7 +15,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import math
-from Tkinter import*
+from tkinter import *
 from Graphs import *
 
 
@@ -98,9 +98,10 @@ def draw_graph(G, show_numbers, radius, padding_left, label,  w):
 #
 # Creates a random graph and an isomorphic copy.
 #
-num_edges = 42
-g = random_graph(num_edges)
+num_edges = 150
+num_vertices = 20
+g = random_graph_fix_degree(num_vertices, 5)
 g2 = g.isomorphic_copy()[0]
 
-print 'The random graph has '+str(g.num_vertices())+' vertices and '+str(num_edges)+ ' edges.'
+print ('The random graph has '+str(g.num_vertices())+' vertices and '+str(num_edges)+ ' edges.')
 show_graphs(g, g2, False)
